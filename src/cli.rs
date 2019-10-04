@@ -7,6 +7,8 @@ use std::result::Result;
 
 pub struct AppLaunchArgs {
     pub target: PathBuf,
+    pub no_scroll: bool,
+    pub width: usize,
 }
 
 /// declare the possible CLI arguments, and gets the values
@@ -16,6 +18,19 @@ fn get_cli_args<'a>() -> clap::ArgMatches<'a> {
         .author("dystroy <denys.seguret@gmail.com>")
         .about("minimal rough markdown viewer")
         .arg(clap::Arg::with_name("target").help("sets the file to open"))
+        .arg(
+            clap::Arg::with_name("no-scroll")
+                .help("Disables use of scroll view")
+                .long("no-scroll")
+                .short("s"),
+        )
+        .arg(
+            clap::Arg::with_name("width")
+                .help("Sets output width")
+                .long("width")
+                .short("w")
+                .takes_value(true),
+        )
         .get_matches()
 }
 
@@ -39,5 +54,10 @@ pub fn read_launch_args() -> Result<AppLaunchArgs, ProgramError> {
         })?;
     }
     let target = target.canonicalize()?;
-    Ok(AppLaunchArgs { target })
+    let no_scroll = cli_args.is_present("no-scroll");
+    let width = cli_args.value_of("width")
+        .unwrap_or_default()
+        .parse()
+        .unwrap_or(0);
+    Ok(AppLaunchArgs { target, no_scroll, width })
 }

@@ -46,7 +46,11 @@ fn configure_log() {
 fn run() -> Result<(), ProgramError> {
     configure_log();
     let launch_args = cli::read_launch_args()?;
-    viewer::run(&launch_args.target)?;
+    viewer::run(viewer::Params{
+        target: &launch_args.target,
+        no_scroll: &launch_args.no_scroll,
+        width: launch_args.width,
+    })?;
     Ok(())
 }
 
